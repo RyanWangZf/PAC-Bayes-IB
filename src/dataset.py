@@ -4,7 +4,6 @@ import os
 import numpy as np
 import pdb
 
-
 np.random.seed(2020)
 
 def unpickle(file):
@@ -86,8 +85,8 @@ def load_mnist(data_dir="../data", validation_size = 5000, flatten = True):
     val_labels = train_labels[:validation_size]
 
     # preprocessing
-    train_images = train_images.astype(np.float32) / 255
-    test_images  = test_images.astype(np.float32) / 255
+    train_images = train_images.astype(np.float32) / 255.0
+    test_images  = test_images.astype(np.float32) / 255.0
     
     if flatten:
         train_images = np.reshape(train_images, [train_images.shape[0], -1])
