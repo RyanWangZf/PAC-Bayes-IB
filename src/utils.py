@@ -151,3 +151,12 @@ def setup_seed(seed):
     torch.cuda.manual_seed_all(seed)
     np.random.seed(seed)
     torch.backends.cudnn.deterministic = True
+
+def feature_map_size(dataname):
+    ft_map_size = {
+        'cifar10':4,
+        'cifar100':4,
+        'stl10':12,
+        'svhn':4,
+        }
+    return ft_map_size[dataname]
