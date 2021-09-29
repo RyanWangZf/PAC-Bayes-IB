@@ -5,18 +5,22 @@ import torch
 import os
 
 from src.dataset import load_data
-from src.utils import img_preprocess, setup_seed, predict, eval_metric
+from src.utils import img_preprocess, setup_seed, predict, eval_metric, feature_map_size
 from src.utils import train
 from src.models import VGG
 from src.pib_utils import train_pib
 
-__data_set__ = 'cifar10'
+# __data_set__ = 'cifar10'
+# __data_set__ = 'cifar100'
+__data_set__ = 'stl10'
+# __data_set__ = 'svhn'
+
 __prior_ckpt__ = './checkpoints/{}/vgg_prior.pt'.format(__data_set__)
 __save_ckpt__ = './checkpoints/{}/vgg_pib.pt'.format(__data_set__)
 
 opt = {
     'num_epoch':100,
-    'batch_size':32,
+    'batch_size':4, # 32
     'lr':1e-4, 
     'weight_decay':0,
     'beta':1e-1,
@@ -42,7 +46,7 @@ x_va, y_va = img_preprocess(x_va, y_va,)
 x_te, y_te = img_preprocess(x_te, y_te,)
 
 # load model
-model = VGG(num_classes=num_class, dropout_rate=0.0)
+model = VGG(num_classes=num_class, dropout_rate=0.0, last_feature_map_size=feature_map_size(__data_set__))
 model.cuda()
 
 # get prior on the validation set
