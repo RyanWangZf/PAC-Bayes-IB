@@ -7,11 +7,7 @@ from src.utils import img_preprocess, setup_seed, predict, eval_metric, feature_
 from src.utils import train
 from src.models import VGG
 
-# __data_set__ = 'cifar10'
-# __data_set__ = 'cifar100'
-__data_set__ = 'stl10'
-# __data_set__ = 'svhn'
-
+__data_set__ = 'cifar10'
 __save_ckpt__ = './checkpoints/{}/vgg_vanilla.pt'.format(__data_set__)
 
 if not os.path.exists('./checkpoints/{}'.format(__data_set__)):
