@@ -38,7 +38,7 @@ model.cuda()
 # start training model
 train(model, all_tr_idx, x_tr, y_tr, x_va, y_va,
     num_epoch=20, 
-    batch_size=8,  #32
+    batch_size=32,  #32
     lr=1e-4, 
     weight_decay=0, 
     early_stop_ckpt_path=__save_ckpt__, 

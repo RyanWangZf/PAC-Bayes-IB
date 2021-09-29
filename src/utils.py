@@ -117,7 +117,7 @@ def load_model(ckpt_path, model):
 
     return
 
-def predict(model, x, batch_size=300):
+def predict(model, x, batch_size=100):
     model.eval()
     num_all_batch = np.ceil(len(x)/batch_size).astype(int)
     pred = []

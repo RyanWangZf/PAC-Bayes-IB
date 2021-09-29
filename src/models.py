@@ -67,7 +67,7 @@ class VGG(nn.Module):
         classify_result = self.classifier(feature)
         return classify_result
 
-    def compute_information_bp_fast(self,  x_tr, y_tr, batch_size=1000, no_bp = False):
+    def compute_information_bp_fast(self,  x_tr, y_tr, batch_size=200, no_bp = False):
         """Compute the full information with back propagation support.
         Using delta_w.T gw @ gw.T delta_w = (delta_w.T gw)^2 for efficient computation.
         Args:

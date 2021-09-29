@@ -1,0 +1,14 @@
+load from stl-10.
+Files already downloaded and verified
+Files already downloaded and verified
+epoch: 0, acc: 0.2980000078678131
+epoch: 1, acc: 0.4180000126361847
+epoch: 2, acc: 0.4240000247955322
+epoch: 3, acc: 0.46000000834465027
+epoch: 4, acc: 0.48600003123283386
+epoch: 5, acc: 0.5120000243186951
+epoch: 6, acc: 0.492000013589859
+epoch: 7, acc: 0.4700000286102295
+epoch: 8, acc: 0.4780000150203705
+early stop on epoch 8, val acc 0.5120000243186951
+test acc: tensor(0.5115, device='cuda:0')

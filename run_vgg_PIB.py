@@ -10,9 +10,9 @@ from src.utils import train
 from src.models import VGG
 from src.pib_utils import train_pib
 
-# __data_set__ = 'cifar10'
+__data_set__ = 'cifar10'
 # __data_set__ = 'cifar100'
-__data_set__ = 'stl10'
+# __data_set__ = 'stl10'
 # __data_set__ = 'svhn'
 
 __prior_ckpt__ = './checkpoints/{}/vgg_prior.pt'.format(__data_set__)
@@ -20,7 +20,7 @@ __save_ckpt__ = './checkpoints/{}/vgg_pib.pt'.format(__data_set__)
 
 opt = {
     'num_epoch':100,
-    'batch_size':4, # 32
+    'batch_size':32, # 32
     'lr':1e-4, 
     'weight_decay':0,
     'beta':1e-1,

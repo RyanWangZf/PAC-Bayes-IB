@@ -278,15 +278,15 @@ def train_pib(model,
     pretrain_step = 20,
     ):
 
-    if os.path.exists('./checkpoints/vanilla_vgg.pt'):
-        model.load_state_dict(torch.load('./checkpoints/vanilla_vgg.pt'))
+    if os.path.exists('./checkpoints/vgg_pretrain.pt'):
+        model.load_state_dict(torch.load('./checkpoints/vgg_pretrain.pt'))
     else:
         train(model, sub_idx, x_tr, y_tr, x_va, y_va,
             num_epoch=pretrain_step, 
             batch_size=batch_size,
             lr=lr, 
             weight_decay=weight_decay, 
-            early_stop_ckpt_path='./checkpoints/vanilla_vgg.pt', 
+            early_stop_ckpt_path='./checkpoints/vgg_pretrain.pt', 
             early_stop_tolerance=3)
     
     info_dict, loss_acc_dict = train_SGLD(model, 
