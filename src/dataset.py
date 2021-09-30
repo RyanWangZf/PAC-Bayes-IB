@@ -12,6 +12,10 @@ def unpickle(file):
     return dict
 
 def load_data(data_name, class_list = None):
+    if data_name == "mnist":
+        print("load from MNIST")
+        return load_mnist()
+
     if data_name == "cifar10":
         print("load from CIFAR-10.")
         return load_cifar10(class_list = class_list)
@@ -33,7 +37,7 @@ def select_from_one_class(x_tr, y_tr, select_class=0):
     class_idx = all_idx[y_tr == select_class]
     return x_tr[class_idx], y_tr[class_idx]
 
-def load_mnist(data_dir="../data", validation_size = 5000, flatten = True):
+def load_mnist(data_dir="./data", validation_size = 5000, flatten = True):
     import gzip
     def _read32(bytestream):
         dt = np.dtype(np.uint32).newbyteorder(">")

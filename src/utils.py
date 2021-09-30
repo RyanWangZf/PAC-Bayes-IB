@@ -2,6 +2,7 @@
 import torch
 import numpy as np
 import pandas as pd
+import os
 import pdb
 import torchvision.transforms
 import torch.optim as optim
@@ -24,6 +25,34 @@ def img_preprocess(x, y=None, use_gpu=True):
     else:
         return x
 
+def img_preprocess_cifar(x, y=None, use_gpu=True):
+    mean_list = [125.3, 123.0, 113.9]
+    std_list = [63.0, 62.1, 66.7]
+
+    new_x_list = []
+    for i, m in enumerate(mean_list):
+        x_ = (x[:,i] - m) / (std_list[i])
+        new_x_list.append(x_)
+    
+    x = np.array(new_x_list).transpose(1,0,2,3)
+    
+    # flatten
+    x = x.reshape(len(x), 3*32*32)
+    x = torch.Tensor(x)
+
+    if use_gpu:
+        x = x.cuda()
+
+    if y is not None:
+        y = torch.LongTensor(y)
+        if use_gpu:
+            y = y.cuda()
+
+        return x, y
+
+    else:
+        return x
+
 def train(model,
     sub_idx,
     x_tr, y_tr, 
@@ -34,6 +63,7 @@ def train(model,
     weight_decay,
     early_stop_ckpt_path,
     early_stop_tolerance=3,
+    verbose=True,
     ):
     """Given selected subset, train the model until converge.
     """
@@ -41,6 +71,9 @@ def train(model,
     best_va_acc = 0
     num_all_train = 0
     early_stop_counter = 0
+
+    if not os.path.exists('./checkpoints'):
+        os.makedirs('./checkpoints')
 
     # init training
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr, weight_decay=weight_decay)
@@ -82,8 +115,8 @@ def train(model,
             model.eval()
             pred_va = predict(model, x_va)
             acc_va = eval_metric(pred_va, y_va, num_class)
-
-            print("epoch: {}, acc: {}".format(epoch, acc_va.item()))
+            if verbose:
+                print("epoch: {}, acc: {}".format(epoch, acc_va.item()))
             
             if epoch == 0:
                 best_va_acc = acc_va
@@ -98,12 +131,107 @@ def train(model,
                 early_stop_counter += 1
 
             if early_stop_counter >= early_stop_tolerance:
-                print("early stop on epoch {}, val acc {}".format(epoch, best_va_acc))
+                if verbose:
+                    print("early stop on epoch {}, val acc {}".format(epoch, best_va_acc))
                 # load model from the best checkpoint
                 load_model(early_stop_ckpt_path, model)
                 break
 
     return best_va_acc
+
+def train_track_info(model,
+    sub_idx,
+    x_tr, y_tr, 
+    x_va, y_va, 
+    num_epoch,
+    batch_size,
+    lr,
+    weight_decay,
+    track_info_per_iter=10,
+    verbose=True,
+    ):
+    """Given selected subset, train the model until converge.
+    Args:
+        model: the trained model class
+        sub_idx: picked sample indices in training data
+        x_tr, y_tr, x_va, y_va: tr/va data set and labels
+        track_info_per_iter: evaluate information per %S iterations (SGD updates)
+    """
+
+    info_dict = defaultdict(list)
+    loss_acc_dict = defaultdict(list)
+
+    # init training with the SGLD optimizer
+    optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr, weight_decay=weight_decay)
+
+    # num class
+    num_class = torch.unique(y_va).shape[0]
+    num_all_tr_batch = int(np.ceil(len(sub_idx) / batch_size))
+    num_all_train = 0
+    iteration = 0
+    for epoch in range(num_epoch):
+        total_loss = 0
+        model.train()
+        np.random.shuffle(sub_idx)
+
+        for idx in range(num_all_tr_batch):
+            iteration += 1
+            batch_idx = sub_idx[idx*batch_size:(idx+1)*batch_size]
+            x_batch = x_tr[batch_idx]
+            y_batch = y_tr[batch_idx]
+
+            pred = model(x_batch)
+
+            if num_class > 2:
+                loss = F.cross_entropy(pred, y_batch,
+                    reduction="none")
+            else:
+                loss = F.binary_cross_entropy(pred[:,0], y_batch.float(), 
+                    reduction="none")
+
+            avg_loss = torch.mean(loss)
+
+            optimizer.zero_grad()
+
+            avg_loss.backward()
+
+            optimizer.step()
+
+            num_all_train += len(x_batch)
+
+            total_loss = total_loss + avg_loss.item()
+
+            if iteration % track_info_per_iter == 0:
+                # estimate information stored in weights
+                info = model.compute_information_bp_fast(x_tr, y_tr, no_bp=True)
+                for k in info.keys():
+                    info_dict[k].append(info[k])
+                if verbose:
+                    print("iteration/epoch: {}/{}, info: {}".format(iteration, epoch, info))
+        if verbose:
+            print("epoch: {}, tr loss: {}, lr: {:.6f}".format(epoch, total_loss/num_all_tr_batch, lr))
+
+        # start to evaluate
+        if epoch % 1 == 0:
+            model.eval()
+            pred_tr = predict(model, x_tr)
+            acc_tr = eval_metric(pred_tr, y_tr, num_class)
+
+            loss_acc_dict["tr_loss"].append((total_loss/num_all_tr_batch))
+            loss_acc_dict["tr_acc"].append(acc_tr.item())
+
+            if x_va is not None:
+                # evaluate on va set
+                model.eval()
+                pred_va = predict(model, x_va)
+                acc_va = eval_metric(pred_va, y_va, num_class)
+                if verbose:
+                    print("epoch: {}, va acc: {}".format(epoch, acc_va.item()))
+                loss_acc_dict["va_acc"].append(acc_va.item())
+
+
+    return info_dict, loss_acc_dict
+
 
 def save_model(ckpt_path, model):
     torch.save(model.state_dict(), ckpt_path)
