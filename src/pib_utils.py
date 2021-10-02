@@ -288,7 +288,8 @@ def train_pib(model,
             lr=lr, 
             weight_decay=weight_decay, 
             early_stop_ckpt_path='./checkpoints/vgg_pretrain.pt', 
-            early_stop_tolerance=3)
+            early_stop_tolerance=3,
+            verbose=False)
     
     info_dict, loss_acc_dict = train_SGLD(model, 
         sub_idx, x_tr, y_tr, x_va, y_va, 
@@ -303,5 +304,6 @@ def train_pib(model,
         schedule=schedule,
         gamma=gamma,
         )
-
+        
+    os.remove('./checkpoints/vgg_pretrain.pt')
     return info_dict, loss_acc_dict

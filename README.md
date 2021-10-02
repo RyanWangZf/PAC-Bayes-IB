@@ -17,6 +17,9 @@ This repo provides the demonstration of our recent paper on identifying informat
 3. use `python run_vgg_PIB.py`
 
 
+or refer to **demo_track_pac_bayes_ibpynb** for a look.
+
+
 
 ### :smile:If you find this result interesting, please consider to cite this paper:
 
