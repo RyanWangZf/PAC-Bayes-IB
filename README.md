@@ -4,6 +4,8 @@
 
 This repo provides the demonstration of our recent paper on identifying information in deep neural networks through *PAC-Bayes Information Bottleneck*.
 
+
+
 ### :fire:For reproducing the phase transition phenomenon captured by PAC-Bayes IB
 
 1. please refer to the jupyter notebook **demo_track_information.ipynb**.
