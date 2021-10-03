@@ -151,12 +151,31 @@ class MLP(nn.Module):
         assert activation in ["linear","tanh","relu","sigmoid"]
 
         self.flatten = Flatten()
-        # 1024 - 512 - 10
-        self.mlp_layers = [nn.Linear(28*28, layers[0])]
-        
-        if len(layers) > 1:
-            for i, l in enumerate(layers[:-1]):
-                self.mlp_layers.append(nn.Linear(layers[i], layers[i+1]))
+        self.has_hidden = False
+
+        if len(layers) == 0:
+            self.mlp_layers = []
+            self.dense_final = nn.Linear(28*28, num_class)
+        else:
+            self.has_hidden = True
+            # 728 - 512 - 10
+            self.mlp_layers = [nn.Linear(28*28, layers[0])]
+            if len(layers) > 1:
+                for i, l in enumerate(layers[:-1]):
+                    self.mlp_layers.append(nn.Linear(layers[i], layers[i+1]))
+                    if activation == "tanh":
+                        self.mlp_layers.append(nn.Tanh())
+                    elif activation == "relu":
+                        self.mlp_layers.append(nn.ReLU())
+                    elif activation == "sigmoid":
+                        self.mlp_layers.append(nn.Sigmoid())
+                    else:
+                        self.mlp_layers.append(IdentityMapping())
+                    
+                    if dropout > 0:
+                        self.is_dropout = True
+                        self.mlp_layers.append(nn.Dropout(dropout))
+            else:
                 if activation == "tanh":
                     self.mlp_layers.append(nn.Tanh())
                 elif activation == "relu":
@@ -165,32 +184,20 @@ class MLP(nn.Module):
                     self.mlp_layers.append(nn.Sigmoid())
                 else:
                     self.mlp_layers.append(IdentityMapping())
-                
-                if dropout > 0:
-                    self.is_dropout = True
-                    self.mlp_layers.append(nn.Dropout(dropout))
-        else:
-            if activation == "tanh":
-                self.mlp_layers.append(nn.Tanh())
-            elif activation == "relu":
-                self.mlp_layers.append(nn.ReLU())
-            elif activation == "sigmoid":
-                self.mlp_layers.append(nn.Sigmoid())
-            else:
-                self.mlp_layers.append(IdentityMapping())
 
-        self.hidden_net = nn.Sequential(*self.mlp_layers)
-        self.dense_final = nn.Linear(layers[-1], num_class)
+            self.hidden_net = nn.Sequential(*self.mlp_layers)
+            self.dense_final = nn.Linear(layers[-1], num_class)
 
         self.early_stopper = None
         self.num_class = num_class
-        pass
 
     def forward(self, x):
         is_training = self.training
-        x = self.hidden_net(x)
-        x = self.dense_final(x)
-        # x = self.softmax(x)
+        if self.has_hidden:
+            x = self.hidden_net(x)
+            x = self.dense_final(x)
+        else:
+            x = self.dense_final(x)
         return x
 
     def predict(self, x, batch_size=1000, onehot=False):

@@ -8,6 +8,19 @@ This repo provides the demonstration of our recent paper on identifying informat
 
 1. please refer to the jupyter notebook **demo_track_information.ipynb**.
 
+ <center class="half">
+     <img src="./figure/mlp_1_info.png" width="250"/><img src="./figure/mlp_2_info.png" width="250"/>
+ </center>
+
+
+
+ <center class="half">
+     <img src="./figure/mlp_3_info.png" width="250"/><img src="./figure/mlp_4_info.png" width="250"/>
+ </center>
+
+we can see that deeper layer accelerate the fitting and compressing of deep neural networks!
+
+
 
 
 ### :fire:For comparing the performance of the PIB-based SGD algorithm:
