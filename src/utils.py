@@ -142,6 +142,31 @@ def train(model,
 
     return best_va_acc
 
+def train_prior(model,
+    x_tr, y_tr,
+    num_epoch=10,
+    batch_size=128,
+    lr=1e-3,
+    weight_decay=1e-5,
+    early_stop_ckpt_path="./checkpoints/mlp_prior.pth",
+    verbose=False,
+    ):
+    all_tr_idx = np.arange(len(x_tr))
+    train(model, all_tr_idx, x_tr, y_tr, x_tr, y_tr, 
+        num_epoch=num_epoch,
+        batch_size=batch_size,
+        lr=lr,
+        weight_decay=weight_decay,
+        early_stop_ckpt_path=early_stop_ckpt_path,
+        verbose=verbose,
+        )
+    w0_dict = dict()
+    for param in model.named_parameters():
+        w0_dict[param[0]] = param[1].clone().detach() # detach but still on gpu
+    model.w0_dict = w0_dict
+    model._initialize_weights()
+    print("done get prior weights")
+
 def train_track_info(model,
     sub_idx,
     x_tr, y_tr, 
@@ -240,6 +265,12 @@ def train_track_info(model,
                 info_dict[k].append(info[k])
             if verbose:
                 print("epoch: {}, info: {}".format(epoch, info))
+        
+            l2_norm = 0
+            for pa in model.named_parameters():
+                l2_norm += pa[1].data.norm(2)
+            loss_acc_dict["l2_norm"].append(l2_norm.cpu().item())
+
 
 
     return info_dict, loss_acc_dict
@@ -348,13 +379,14 @@ def plot_info(info_dict, fig_dir='./figure', use_legend=True):
         fig, axs = plt.subplots(figsize=(6,4))
         for i,col in enumerate(df_info.columns):
             axs.plot(df_info[col], label=__LAYER_LIST__[i], lw=2)
-        axs.set_xlabel('iteration', size=24)
-        axs.set_ylabel('IIW',size=24)
-        axs.tick_params(labelsize=20)
+        axs.set_xlabel('iteration', size=28)
+        axs.set_ylabel('IIW',size=28)
+        axs.tick_params(labelsize=24)
         axs.yaxis.get_major_formatter().set_powerlimits((0,1))
-        axs.set_title('IIW of {}-layer MLP'.format(int(len(df_info.columns))), size=20)
+        axs.set_title('IIW of {}-layer MLP'.format(int(len(df_info.columns))), size=28)
         if use_legend:
-            axs.legend(fontsize=24)
+            axs.legend(fontsize=26)
         plt.tight_layout()
     plt.savefig(os.path.join(fig_dir,"mlp_{}_info.pdf".format(int(len(df_info.columns)))),bbox_inches = 'tight')
     plt.show()
+

@@ -4,6 +4,44 @@
 
 This repo provides the demonstration of our recent paper on identifying information in deep neural networks through *PAC-Bayes Information Bottleneck*.
 
+How do we **train an MLP model and track the information in weights during the training**? Just use the following codes!
+
+```python
+from src.models import MLP
+from src.dataset import load_data
+from src.utils import plot_info_acc
+from src import train_track_info, img_preprocess, train_prior
+
+# pre-process the input mnist data
+x_tr, y_tr, x_va, y_va, x_te, y_te = load_data('mnist')
+x_tr, y_tr = img_preprocess(x_tr, y_tr)
+x_va, y_va = img_preprocess(x_va, y_va)
+x_te, y_te = img_preprocess(x_te, y_te)
+
+# initialize the model and get the prior for tracking information
+model = MLP()
+model.cuda()
+train_prior(model, x_va, y_va)
+
+# trigger training and view the information trajectory!
+info_dict, loss_acc_list = train_track_info(model, list(range(len(x_tr))), x_tr, y_tr, x_va, y_va, 
+                               num_epoch=20,
+                               batch_size=128, 
+                               lr=1e-4,
+                               weight_decay=0,
+                               track_info_per_iter=-1, # track the information after how many iterations
+                               verbose=False,)
+plot_info_acc(info_dict, loss_acc_list, 'relu', './')
+```
+
+we shall get the following image
+
+<p float="left">
+  <img src="./figure/relu_acc_loss.png" width="250" />
+</p>
+
+which reproduces the experiment results in the paper.
+
 
 
 ### :fire:For reproducing the phase transition phenomenon captured by PAC-Bayes IB

@@ -143,7 +143,7 @@ class VGG(nn.Module):
 
 
 class MLP(nn.Module):
-    def __init__(self, num_class=10, activation=None, dropout=0, layers = [512]):
+    def __init__(self, num_class=10, activation='relu', dropout=0, layers = [512]):
         super(MLP, self).__init__()
         self.softmax = nn.functional.softmax
         self.layers = layers
