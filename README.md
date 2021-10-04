@@ -24,6 +24,17 @@ we can see that deeper layer accelerate the fitting and compressing of deep neur
 
 
 
+### :fire:For reproducing the information in weights w.r.t. batch size and generalization gap
+
+1. please refer to the jupyter notebook **demo_batch_size_info.ipynb**.
+
+   <p float="left">
+     <img src="./figure/info_batch_size.png" width="600" />
+   </p>
+
+we can see that the IIW corresponds to the generalization gap (train acc - test acc) on the left hand side!
+
+
 
 ### :fire:For comparing the performance of the PIB-based SGD algorithm:
 

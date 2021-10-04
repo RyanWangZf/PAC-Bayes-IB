@@ -1,0 +1,3 @@
+torch
+matplotlib
+SciencePlots==1.0.9
