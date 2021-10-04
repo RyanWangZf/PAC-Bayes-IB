@@ -3,8 +3,12 @@ import pickle
 import os
 import numpy as np
 import pdb
+from .utils import img_preprocess_cifar, img_preprocess
 
-np.random.seed(2020)
+__preprocess_fn__ = {
+        'img_preprocess': img_preprocess, 
+        'img_preprocess_cifar': img_preprocess_cifar
+        }
 
 def unpickle(file):
     with open(file, 'rb') as fo:

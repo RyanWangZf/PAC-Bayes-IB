@@ -42,6 +42,36 @@ we shall get the following image
 
 which reproduces the experiment results in the paper.
 
+It is also easy to transform a model to PAC-Bayes IB augmented one! See the following codes:
+
+```python
+from src.models import VGG
+from src.dataset import load_data
+from src import img_preprocess, train_prior, train_iiw
+
+# load data
+x_tr, y_tr, x_va, y_va, x_te, y_te = load_data('cifar10')
+x_tr, y_tr = img_preprocess(x_tr, y_tr)
+x_va, y_va = img_preprocess(x_va, y_va)
+x_te, y_te = img_preprocess(x_te, y_te)
+
+# initialize model and get prior
+model = VGG()
+model.cuda()
+train_prior(model, x_va, y_va)
+
+# train with iiw regularization!
+# specify the parameters you want for computing IIW and regularize
+# or just set param_list=None to use all parameters for trainining!
+param_list = ['extract_feature.0.weight', 'extract_feature.2.weight']
+info_dict, loss_acc_list = train_iiw(model, list(range(len(x_tr))), 
+                                    x_tr, y_tr, x_va, y_va,
+                                    param_list=param_list,
+                                    verbose=True,)
+```
+
+
+
 
 
 ### :fire:For reproducing the phase transition phenomenon captured by PAC-Bayes IB

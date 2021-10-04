@@ -11,7 +11,7 @@ from torch.nn import Parameter
 from torch.autograd import grad
 
 class VGG(nn.Module):
-    def __init__(self, num_classes, last_feature_map_size=4, dropout_rate=0.0):
+    def __init__(self, num_classes=10, last_feature_map_size=4, dropout_rate=0.0):
         super(VGG, self).__init__()
         self.num_classes = num_classes
         self.num_class = num_classes
