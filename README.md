@@ -118,13 +118,13 @@ or refer to **demo_track_pac_bayes_ibpynb** for a look.
 ### :smile:If you find this result interesting, please consider to cite this paper:
 
 ```latex
-@article{wang2021pacbayes,
-    title={PAC-Bayes Information Bottleneck},
-    author={Zifeng Wang and Shao-Lun Huang and Ercan E. Kuruoglu and Jimeng Sun and Xi Chen and Yefeng Zheng},
-    year={2021},
-    eprint={2109.14509},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+@inproceedings{
+    wang2022pacbayes,
+    title={{PAC}-Bayes Information Bottleneck},
+    author={Zifeng Wang and Shao-Lun Huang and Ercan Engin Kuruoglu and Jimeng Sun and Xi Chen and Yefeng Zheng},
+    booktitle={International Conference on Learning Representations},
+    year={2022},
+    url={https://openreview.net/forum?id=iLHOIDsPv1P}
 }
 ```
 
